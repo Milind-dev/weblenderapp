@@ -1,0 +1,116 @@
+ // const sorts = foodstorestore.sort((a, b) => {
+    //     console.log(b.id - a.id);
+    //     return b.id - a.id;
+    // });
+    // console.log("sorts",sorts)
+
+    // const z = foodstorestore.sort((a, b) => b.title - a.title);
+    //     console.log("a" , z);
+
+
+
+
+
+
+
+
+
+
+    import React, { useEffect, useState } from "react";
+import '../../css/Local.css'
+import Addcart from "../../loaders/modal/Addcart";
+import { Rings } from 'react-loader-spinner';
+import Addsorts from "./Addsorts";
+
+
+const Localfiles = () => {
+  const [loading, setLoading] = useState(false);
+  const [inputsearch, setinputsearch] = useState("");
+  const [foodstore, setfoodstore] = useState([]);
+  const [addcartspoon, setaddcartspoon] = useState([]);
+
+  const handlecartbtn = (e, item) => {
+    e.preventDefault();
+    setaddcartspoon([...addcartspoon, item]);
+  };
+
+  const myFunction = async () => {
+    const datas = await fetch(`http://localhost:5000/localdatas`, {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+      },
+    });
+  
+    const result = await datas.json();
+    setTimeout(() => {
+      setLoading(true);
+      setfoodstore(result.data.products);
+    }, 4000);
+    console.log("results", result.data.products);
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      myFunction();
+    }, 1000);
+  }, [inputsearch]);
+
+  return (
+    <React.Fragment>
+      <div className="foodinputcontainer">
+      <Addcart addcarting={addcartspoon} />
+      <Addsorts foodstorestore = {foodstore} />
+      <div>
+        <input
+          type="text"
+          className="foodsearchinput"
+          value={inputsearch}
+          onChange={(e) => setinputsearch(e.target.value)}
+          placeholder="search data food"
+        />
+      </div>
+
+      {loading
+        ? foodstore.map((item) => {
+            return (
+              <>
+                <div key={item.id} className="foodstore">
+                  <p>id = {item.id}</p>
+                  <p>title = {item?.title}</p>
+                  <img src={item?.image} alt="curd" />
+                  <button className="addcartshow" onClick={(e) => handlecartbtn(e, item)}>
+                    add on cart
+                  </button>
+                </div>
+              </>
+            );
+          })
+        : <Rings color="#00BFFF" height={180} width={180} />
+      }
+           {!loading
+        ? foodstore.map((item) => {
+            return (
+              <>
+                <div key={item.id} className="foodstore">
+                  <p>id = {item.id}</p>
+                  <p>title = {item?.title}</p>
+                  <img src={item?.image} alt="curd" />
+                  <button className="addcartshow" onClick={(e) => handlecartbtn(e, item)}>
+                    add on cart
+                  </button>
+                </div>
+              </>
+            );
+          })
+        : <Rings color="#00BFFF" height={180} width={180} />
+      }
+
+      </div>
+      
+
+    </React.Fragment>
+  );
+};
+
+export default Localfiles;
